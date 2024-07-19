@@ -7,7 +7,7 @@ pub fn install_hooks() -> color_eyre::Result<()> {
     // convert from color_eyre hook into std panic hook
     let panic_hook = panic_hook.into_panic_hook();
     std::panic::set_hook(Box::new(move |panic_info| {
-        crate::init::restore().unwrap();
+        crate::tui::restore().unwrap();
         panic_hook(panic_info);
     }));
 
@@ -15,7 +15,7 @@ pub fn install_hooks() -> color_eyre::Result<()> {
     let eyre_hook = eyre_hook.into_eyre_hook();
     eyre::set_hook(Box::new(
         move |error: &(dyn std::error::Error + 'static)| {
-            crate::init::restore().unwrap();
+            crate::tui::restore().unwrap();
             eyre_hook(error)
         },
     ))?;

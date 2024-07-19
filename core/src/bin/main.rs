@@ -9,8 +9,8 @@ fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
 
 fn tui() -> Result<(), color_eyre::Report> {
     let opts = grit::opts::Opts::parse();
-    let mut terminal = grit::init::init(&opts)?;
+    let mut terminal = grit::tui::init(&opts)?;
     grit::app::App::new()?.run(&mut terminal)?;
-    grit::init::restore()?;
+    grit::tui::restore()?;
     Ok(())
 }

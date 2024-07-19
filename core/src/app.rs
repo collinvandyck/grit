@@ -70,7 +70,7 @@ impl App {
         Ok(app)
     }
 
-    pub fn run(&mut self, terminal: &mut crate::init::Tui) -> EResult<()> {
+    pub fn run(&mut self, terminal: &mut crate::tui::Tui) -> EResult<()> {
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events().wrap_err("handle events failed")?;
