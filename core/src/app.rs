@@ -21,7 +21,7 @@ pub enum Error {
 }
 
 pub struct App {
-    repo: git::Repository,
+    repo: git::repo::Repository,
     branch_list: BranchList,
     exit: bool,
 }
@@ -35,7 +35,7 @@ struct BranchList {
 }
 
 struct BranchItem {
-    branch: git::Branch,
+    branch: git::branch::Branch,
 }
 
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
@@ -58,7 +58,7 @@ impl Widget for &mut App {
 
 impl App {
     pub fn new() -> EResult<Self> {
-        let repo = git::Repository::current().wrap_err("read repo")?;
+        let repo = git::repo::Repository::current().wrap_err("read repo")?;
         let branches = BranchList::default();
         let exit = false;
         let mut app = Self {
@@ -80,7 +80,7 @@ impl App {
 
     pub fn load_branches(&mut self) -> EResult<()> {
         let filter = self.branch_list.filter.clone();
-        let branches: Vec<git::Branch> = self
+        let branches: Vec<git::branch::Branch> = self
             .repo
             .branches(filter.typ())
             .wrap_err("get branches")?
@@ -156,7 +156,7 @@ impl App {
             .border_style(HEADER_STYLE)
             .bg(NORMAL_ROW_BG);
         let commits = branch
-            .commits
+            .commits()
             .iter()
             .map(|c| {
                 let summary = c.summary.as_str();
@@ -243,7 +243,7 @@ impl App {
 
     fn toggle_branch(&mut self) -> EResult<()> {
         if let Some(i) = self.branch_list.state.selected() {
-            let branch = &self.branch_list.items[i];
+            let _branch = &self.branch_list.items[i];
         }
         Ok(())
     }
@@ -257,7 +257,7 @@ impl BranchList {
     fn current(&self) -> Option<&BranchItem> {
         self.state.selected().and_then(|i| self.items.get(i))
     }
-    fn build(branches: Vec<git::Branch>, filter: BranchTypeFilter) -> Self {
+    fn build(branches: Vec<git::branch::Branch>, filter: BranchTypeFilter) -> Self {
         let sort = BranchSort::default();
         let mut items = branches.into_iter().map(BranchItem::new).collect();
         let mut state = ListState::default();
