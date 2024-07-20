@@ -1,5 +1,4 @@
 use super::repo;
-use crate::prelude::*;
 use chrono::{DateTime, Utc};
 use color_eyre::{
     eyre::{Context, ContextCompat},
@@ -10,9 +9,9 @@ use std::{fmt::Display, sync::Arc};
 
 pub struct Branch {
     repo: Arc<repo::Inner>,
-    name: String,
-    typ: BranchType,
-    commits: Vec<Commit>,
+    pub name: String,
+    pub typ: BranchType,
+    pub commits: Vec<Commit>,
 }
 
 impl Display for Branch {

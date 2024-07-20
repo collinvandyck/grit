@@ -1,4 +1,4 @@
-use crate::{git, prelude::*};
+use crate::{git, opts::Opts, prelude::*};
 use color_eyre::eyre::Context;
 use git2::BranchType;
 
@@ -35,7 +35,7 @@ struct BranchList {
 }
 
 struct BranchItem {
-    branch: git::branch::Branch,
+    pub branch: git::branch::Branch,
 }
 
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
@@ -57,7 +57,10 @@ impl Widget for &mut App {
 }
 
 impl App {
-    pub fn new() -> EResult<Self> {
+    pub fn new(opts: &Opts) -> EResult<Self> {
+        if let Some(dir) = &opts.dir {
+            std::env::set_current_dir(dir).wrap_err("change dir")?;
+        }
         let repo = git::repo::Repository::current().wrap_err("read repo")?;
         let branches = BranchList::default();
         let exit = false;
@@ -315,7 +318,7 @@ impl BranchList {
 }
 
 impl BranchItem {
-    fn new(val: git::Branch) -> Self {
+    fn new(val: git::branch::Branch) -> Self {
         Self { branch: val }
     }
 }
@@ -353,10 +356,4 @@ impl BranchTypeFilter {
             Some(BranchType::Remote) => None,
         };
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use ratatui::style::Style;
 }
