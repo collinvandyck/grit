@@ -21,7 +21,7 @@ pub enum Error {
 }
 
 pub struct App {
-    repo: git::repo::Repository,
+    repo: git::Repository,
     branch_list: BranchList,
     exit: bool,
 }
@@ -35,7 +35,7 @@ struct BranchList {
 }
 
 struct BranchItem {
-    pub branch: git::branch::Branch,
+    pub branch: git::Branch,
 }
 
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
@@ -61,7 +61,7 @@ impl App {
         if let Some(dir) = &opts.dir {
             std::env::set_current_dir(dir).wrap_err("change dir")?;
         }
-        let repo = git::repo::Repository::current().wrap_err("read repo")?;
+        let repo = git::Repository::current().wrap_err("read repo")?;
         let branches = BranchList::default();
         let exit = false;
         let mut app = Self {
@@ -83,7 +83,7 @@ impl App {
 
     pub fn load_branches(&mut self) -> EResult<()> {
         let filter = self.branch_list.filter.clone();
-        let branches: Vec<git::branch::Branch> = self
+        let branches: Vec<git::Branch> = self
             .repo
             .branches(filter.typ())
             .wrap_err("get branches")?
@@ -260,7 +260,7 @@ impl BranchList {
     fn current(&self) -> Option<&BranchItem> {
         self.state.selected().and_then(|i| self.items.get(i))
     }
-    fn build(branches: Vec<git::branch::Branch>, filter: BranchTypeFilter) -> Self {
+    fn build(branches: Vec<git::Branch>, filter: BranchTypeFilter) -> Self {
         let sort = BranchSort::default();
         let mut items = branches.into_iter().map(BranchItem::new).collect();
         let mut state = ListState::default();
@@ -318,7 +318,7 @@ impl BranchList {
 }
 
 impl BranchItem {
-    fn new(val: git::branch::Branch) -> Self {
+    fn new(val: git::Branch) -> Self {
         Self { branch: val }
     }
 }
