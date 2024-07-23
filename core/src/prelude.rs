@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 pub use color_eyre::eyre::Result as EResult;
 pub use ratatui::{
     backend::CrosstermBackend,
