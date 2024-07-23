@@ -73,7 +73,7 @@ impl App {
         Ok(app)
     }
 
-    pub fn run(&mut self, terminal: &mut crate::tui::Tui) -> EResult<()> {
+    pub fn run(&mut self, terminal: &mut crate::bootstrap::Tui) -> EResult<()> {
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events().wrap_err("handle events failed")?;
@@ -262,8 +262,8 @@ impl BranchList {
     }
     fn build(branches: Vec<git::Branch>, filter: BranchTypeFilter) -> Self {
         let sort = BranchSort::default();
-        let mut items = branches.into_iter().map(BranchItem::new).collect();
-        let mut state = ListState::default();
+        let items = branches.into_iter().map(BranchItem::new).collect();
+        let state = ListState::default();
         let mut list = BranchList {
             items,
             state,
@@ -349,6 +349,7 @@ impl BranchTypeFilter {
         self.0.clone()
     }
 
+    #[allow(unused)]
     fn cycle(&mut self) {
         self.0 = match self.0 {
             None => Some(BranchType::Local),

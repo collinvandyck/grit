@@ -1,6 +1,5 @@
 pub mod app;
-pub mod errors;
+pub mod bootstrap;
 pub mod git;
 pub mod opts;
 pub mod prelude;
-pub mod tui;

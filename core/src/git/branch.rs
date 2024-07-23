@@ -60,11 +60,6 @@ impl Branch {
     }
 }
 
-struct BranchId {
-    name: String,
-    typ: BranchType,
-}
-
 #[derive(Clone)]
 pub struct Commit {
     pub summary: String,
@@ -114,8 +109,6 @@ impl TryFrom<git2::Time> for Timestamp {
     type Error = Report;
     fn try_from(value: git2::Time) -> Result<Self, Self::Error> {
         let epoch = value.seconds();
-        let offset = value.offset_minutes();
-        // todo: how to deal with the offset when creating a chrono datetime?
         let dt = DateTime::from_timestamp(epoch, 0)
             .wrap_err_with(|| format!("no timestamp available for epoch {epoch}"))?;
         let ts = Self { epoch, dt };
