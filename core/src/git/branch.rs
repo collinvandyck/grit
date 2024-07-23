@@ -1,14 +1,14 @@
-use super::repo;
+use super::Repository;
 use chrono::{DateTime, Utc};
 use color_eyre::{
     eyre::{Context, ContextCompat},
     Report,
 };
 use git2::BranchType;
-use std::{fmt::Display, sync::Arc};
+use std::fmt::Display;
 
 pub struct Branch {
-    repo: Arc<repo::Inner>,
+    repo: Repository,
     pub name: String,
     pub typ: BranchType,
     pub commits: Vec<Commit>,
@@ -21,11 +21,11 @@ impl Display for Branch {
 }
 
 impl Branch {
-    pub fn new(repo: Arc<repo::Inner>, name: impl AsRef<str>, typ: BranchType) -> Self {
+    pub fn new(repo: &Repository, name: impl AsRef<str>, typ: BranchType) -> Self {
         let commits = Vec::default();
         let name = name.as_ref().to_string();
         Self {
-            repo,
+            repo: repo.clone(),
             name,
             typ,
             commits,
@@ -40,17 +40,18 @@ impl Branch {
     pub fn load(&mut self) -> Result<(), Report> {
         let branch = self
             .repo
+            .inner
             .find_branch(&self.name, self.typ)
             .wrap_err("load branch")?;
         let head = branch.get();
         let commit = head.peel_to_commit().wrap_err("get commit for ref")?;
-        let mut revwalk = self.repo.revwalk().wrap_err("revwalk")?;
+        let mut revwalk = self.repo.inner.revwalk().wrap_err("revwalk")?;
         revwalk.push(commit.id()).wrap_err("revwalk push commit")?;
         self.commits = revwalk
             .take(100)
             .map(|sha| {
                 sha.wrap_err("revwalk sha")
-                    .and_then(|sha| self.repo.find_commit(sha).wrap_err("find commit"))
+                    .and_then(|sha| self.repo.inner.find_commit(sha).wrap_err("find commit"))
                     .and_then(|cmt| cmt.try_into().wrap_err("get commit"))
             })
             .collect::<Result<Vec<_>, _>>()

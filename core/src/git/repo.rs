@@ -6,7 +6,7 @@ use super::branch::Branch;
 
 #[derive(Debug, Clone)]
 pub struct Repository {
-    inner: Arc<Inner>,
+    pub(super) inner: Arc<Inner>,
 }
 
 pub struct Inner {
@@ -47,7 +47,7 @@ impl Repository {
                     let (branch, typ) = br_res.wrap_err("branch")?;
                     let name = branch.name().wrap_err("branch name")?;
                     if let Some(name) = name {
-                        let branch = Branch::new(self.inner.clone(), name, typ);
+                        let branch = Branch::new(self, name, typ);
                         Ok(Some(branch))
                     } else {
                         Ok(None)
